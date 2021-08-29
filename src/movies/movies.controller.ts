@@ -1,41 +1,45 @@
-import { Controller, Get, Param, Post, Delete, Patch, Body, Query } from '@nestjs/common';
-import { deflateSync } from 'zlib';
-
+import {
+  Controller,
+  Get,
+  Param,
+  Post,
+  Delete,
+  Patch,
+  Body,
+  Query,
+} from '@nestjs/common';
+import { MoviesService } from './movies.service';
+import { Movie } from './entities/movie.entity';
+  
 @Controller('movies')
 export class MoviesController {
+  constructor(private readonly moviesService: MoviesService) {}
+
   @Get()
-  getAll() {
-    return 'This will return all movies';
-  }
+  getAll(): Movie[] {
+    return this.moviesService.getAll();
+ }
 
-  @Get('/search') //:id보다 위에 있어야 한다, 아니면 id가 search인줄 알고 search가 제대로 동작X
-  search(@Query('year') searchingYear: string) {
-    return `We are searching for a movie made after: ${searchingYear}`;
-  }
-
-  @Get('/:id')
-  getOne(@Param('id') movieId: string): string {
-    return `This will return one movie with the id: ${movieId}`;
+  @Get(':id')
+  getOne(@Param('id') movieId: string): Movie {
+    return this.moviesService.getOne(movieId);
   }
 
   @Post()
-  Create(@Body() movieData) {
-    console.log(movieData);
-    return movieData;
+  create(@Body() movieData) {
+    return this.moviesService.create(movieData);
   }
 
-  @Delete('/:id')
+  @Delete(':id')
   remove(@Param('id') movieId: string) {
-    return `This will delete a movie the id: ${movieId}`;
+    return this.moviesService.deleteOne(movieId);
   }
 
-  @Patch('/:id') //update
+  @Patch(':id')
   patch(@Param('id') movieId: string, @Body() updateData) {
     return {
       updatedMovie: movieId,
       ...updateData,
     };
   }
-
- 
 }
